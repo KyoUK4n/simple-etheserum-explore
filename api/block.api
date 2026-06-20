@@ -1,0 +1,42 @@
+syntax = "v1"
+
+info(
+    title: "block"
+    desc: "apis for blocks"
+    version: "v1"
+)
+
+type GetBlockInfoReq {
+    Number int64 `form:"number,optional"`
+    Hash string `form:"hash,optional"`
+    Tag string `form:"tag,optional"`
+    Start int64 `form:"start,optional"`
+    End int64 `form:"end,optional"`
+}
+
+type BlockInfo {
+    Number uint64 `json:"number"`
+    Hash string `json:"hash"`
+    ParentHash string `json:"parentHash"`
+    Time uint64 `json:"time"`
+    Confirmations uint64 `json:"confirmations"`
+    GasLimit uint64 `json:"gasLimit"`
+    GasUsed uint64 `json:"gasUsed"`
+    BaseFee uint64 `json:"baseFee"`
+    TransactionCount int `json:"transactionCount"`
+}
+
+@server(
+    prefix: /api/v1
+    group: v1/blocks
+)
+service etherscan-api {
+    @doc "获取某个区块信息，按照number->hash->tag优先级获取"
+    @handler GetBlockInfo
+    get /blocks/info (GetBlockInfoReq) returns (Response)
+
+    @doc "获取区间[start - end]区块信息"
+    @handler GetBlocks
+    get /blocks (GetBlockInfoReq) returns (Response)
+}
+

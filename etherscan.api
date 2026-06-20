@@ -1,0 +1,21 @@
+syntax = "v1"
+
+import (
+	"api/block.api"
+	"api/transaction.api"
+	"api/balance.api"
+)
+
+type Response {
+	Code int         `json:"code"`
+	Msg  string      `json:"msg"`
+	Data interface{} `json:"data,omitempty"`
+}
+
+type ListResponse {
+	PageSize   int64       `json:"pageSize"`
+	PageIndex  int64       `json:"pageIndex"`
+	TotalCount int64       `json:"totalCount"`
+	List       interface{} `json:"list"`
+}
+

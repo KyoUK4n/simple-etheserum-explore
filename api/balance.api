@@ -1,0 +1,30 @@
+syntax = "v1"
+
+info(
+    title: "balance"
+    desc: "get eth, erc-20 balance"
+    version: "v1"
+)
+
+type (
+    GetBalanceReq {
+        Address string `form:"address"`
+        TokenAddress string `form:"tokenAddress,optional"`
+    }
+
+    BalanceInfo {
+        Amount string `json:"amount"`
+        Decimals int `json:"decimals"`
+        TokenAddress string `form:"tokenAddress,omitempty"`
+    }
+)
+
+@server(
+    prefix: /api/v1
+    group: v1/balance
+)
+service etherscan-api {
+    @doc "获取某个地址的ETH、ERC20代币余额，若TokenAddress未传，则获取ETH余额"
+    @handler GetBalance
+    get /balances (GetBalanceReq) returns (Response)
+}

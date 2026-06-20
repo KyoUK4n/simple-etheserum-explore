@@ -1,0 +1,91 @@
+syntax = "v1"
+
+info(
+    title: "transaction"
+    desc: "apis for transactions"
+    version: "v1"
+)
+
+type (
+    GetTransactionInfoReq {
+        Hash string `path:"hash"`
+    }
+
+    QueryEventLogReq {
+        Address string `form:"address,optional"`
+        TxHash string `form:"txHash,optional"`
+    }
+
+    GetTransactionsReq {
+        Address string `form:"address"`
+        PageIndex int `form:"pageIndex"`
+        PageSize int `form:"pageSize"`
+    }
+
+    PullTransactionsReq {
+        StartBlock uint64 `form:"startBlock"`
+        EndBlock uint64 `form:"endBlock"`
+    }
+)
+
+type (
+    Transaction {
+        Hash string `json:"hash"`
+        From string `json:"from"`
+        To string `json:"to"`
+        Value uint64 `json:"value"`
+        DataLen int `json:"dataLen"`
+        Gas uint64 `json:"gas"`
+        GasPrice uint64 `json:"gasPrice"`
+        Nonce uint64 `json:"nonce"`
+        IsPending bool `json:"isPending"`
+        TransactionReceipt
+    }
+    EventLog {
+        TxHash string `json:"tx_hash"`              // 交易hash，0x开头，方便转换
+        Address string `json:"address"`             // 合约地址
+        EventName string `json:"event_name"`        // 事件名称
+        BlockNumber int64 `json:"block_number"`     // 区块号
+        LogIndex int64 `json:"log_index"`           // 日志索引
+        Topics []EventLogData `json:"topics"`       // 索引字段
+        Data []EventLogData `json:"data"`           // 非索引字段
+        TxTimestamp string `json:"tx_timestamp"`    // 交易时间
+    }
+    EventLogData {
+        Index int `json:"index"`
+        Name string `json:"name"`
+        Type string `json:"type"`
+        Value string `json:"value"`
+    }
+)
+
+type TransactionReceipt {
+    Status uint64 `json:"status,omitempty"`
+    BlockNumber uint64 `json:"blockNumber,omitempty"`
+    BlockHash string `json:"blockHash,omitempty"`
+    TxIndex uint64 `json:"txIndex,omitempty"`
+    Logs uint64 `json:"logs,omitempty"`
+    GasUsed uint64 `json:"gasUsed,omitempty"`
+}
+
+@server(
+    prefix: /api/v1
+    group: v1/transaction
+)
+service etherscan-api {
+    @doc "根据hash获取交易信息"
+    @handler GetTransactionInfo
+    get /transactions/:hash (GetTransactionInfoReq) returns (Response)
+
+    @doc "获取交易的日志"
+    @handler QueryEventLog
+    get /transactions/events (QueryEventLogReq) returns (Response)
+
+    @doc "从DB分页查询交易列表"
+    @handler GetTransactions
+    get /transactions (GetTransactionsReq) returns (Response)
+
+    @doc "提交区块同步任务，任务串行执行，上一个任务未完成时，接口直接返回失败"
+    @handler PullFromBlock
+    get /transactions/pull (PullTransactionsReq) returns (Response)
+}

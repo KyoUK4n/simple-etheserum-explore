@@ -1,0 +1,51 @@
+#########################################################
+# 服务配置文件，可通过环境变量或.env注入配置${ENV_KEY}
+# 配置结构体在{internal/config}中
+#########################################################
+
+# 服务名称
+Name: etherscan-api
+# 定义主机ip
+Host: 0.0.0.0
+# 暴露端口
+Port: 8888
+# 接口统一超市时间：ms
+Timeout: 60000
+# 日志格式配置
+Log:
+  Encoding: plain
+# msyql配置
+Mysql:
+  Datasource: root:123456@tcp(127.0.0.1:3306)/etherscan?charset=utf8mb4&parseTime=True&loc=Local
+# 链上操作相关配置
+Eth:
+  # rpc协议的节点地址
+  RpcUrl: ${ETH_RPC_URL}
+  # ws协议的节点地址
+  WSUrl: ${ETH_WS_URL}
+  # 批量查询区块信息接口的区块数量限制，防止无限制拉取
+  MaxBlockRange: ${ETH_MAX_BLOCK_RANGE}
+  # 对节点请求的频率限制，100ms代表100ms请求一次
+  RequestPeriod: "100ms"
+  # 指定回放区间，(ReplayStartBlock < ReplayEndBlock)
+  # 未配置，或者配置无效时，则会回放(latest - ReplayCount)区间
+  ReplayStartBlock: 0
+  ReplayEndBlock: 0
+  # 配置重放block个数，未配置(<=0)，则默认回放1000个区块
+  ReplayCount: 10
+  # 回放的步长，每次批量拉取区块的个数
+  # 测试网大部分节点提供商有限制，如Alchemy为10
+  ReplayStep: 10
+  # 订阅相关配置，也会用于批量拉取任务时，过滤交易和事件
+  Subscriptions:
+    # abi文件位置
+    - AbiPath: abi/DogeNFT.json
+      # 合约地址
+      Address: 0x04BC30bA7328f6D2cf3181B57CDdcAb4735Be06a
+      # 可以配置过滤indexed字段
+    #    Topics:
+    #      - xxx
+    - AbiPath: abi/AuctionMarket.json
+      Address: 0xA97dFc16C4cdf672b9675C477fB3DA61312180D1
+  #    Topics:
+  #      - xxx
