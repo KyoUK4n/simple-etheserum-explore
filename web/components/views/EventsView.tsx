@@ -83,6 +83,26 @@ export default function EventsView() {
     }
   };
 
+  const renderStatusMessage = () => {
+    if (submitError) {
+      return (
+        <div className="flex items-center gap-2 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
+          <Badge variant="danger">{submitError}</Badge>
+        </div>
+      );
+    }
+
+    if (scanResult) {
+      return (
+        <div className="flex items-center gap-2 p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
+          <Badge variant="success">{scanResult}</Badge>
+        </div>
+      );
+    }
+
+    return null; // 如果两个都不满足，什么都不渲染
+  };
+
   return (
     <div className="space-y-5">
       {/* Scan task form */}
@@ -119,15 +139,7 @@ export default function EventsView() {
             </button>
           </div>
         </form>
-        {submitError ? (
-          <div className="flex items-center gap-2 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
-            <Badge variant="danger">{submitError}</Badge>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2 p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
-            <Badge variant="success">{scanResult}</Badge>
-          </div>
-        )}
+        {renderStatusMessage()}
       </Card>
 
       {/* Events list */}
