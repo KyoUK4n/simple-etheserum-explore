@@ -85,7 +85,7 @@ func (s *SubInfo) errCather() {
 		for {
 			select {
 			case err := <-(*s.Sub).Err():
-				logx.Errorf("catch an error on subscription [%s] : %s", s.address, err)
+				logx.Errorf("catch an error on subscription [%s] : %v", s.address, err)
 				s.resubscribe()
 			}
 		}
