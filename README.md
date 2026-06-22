@@ -21,7 +21,10 @@
 ├── etherscan.go                        # 入口文件
 ├── internal                            # 服务主要逻辑, internal定义，防止外部不正当调用
 │   ├── config                    # 配置相关逻辑和结构体定义
-│   ├── handler                   # api路由相关，go-zero生成
+│   └── handler                   # 路由相关
+        ├── routes.go             # api路由，go-zero生成
+        ├── static_router.go      # 前端静态资源路由
+        └── v1                    # api路由http handler入口文件，go-zero生成
 │   ├── logic                     # 接口逻辑
 │   ├── model                     # DB层
 │   ├── svc                       # 服务全局状态管理
