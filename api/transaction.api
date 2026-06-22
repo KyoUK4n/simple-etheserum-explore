@@ -14,6 +14,8 @@ type (
     QueryEventLogReq {
         Address string `form:"address,optional"`
         TxHash string `form:"txHash,optional"`
+        PageIndex int `form:"pageIndex"`
+        PageSize int `form:"pageSize"`
     }
 
     GetTransactionsReq {
@@ -39,6 +41,7 @@ type (
         GasPrice uint64 `json:"gasPrice"`
         Nonce uint64 `json:"nonce"`
         IsPending bool `json:"isPending"`
+        Timestamp uint64 `json:"timestamp"`
         TransactionReceipt
     }
     EventLog {

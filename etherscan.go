@@ -28,10 +28,13 @@ func main() {
 	var c config.Config
 	conf.MustLoad(*configFile, &c, conf.UseEnv())
 
-	server := rest.MustNewServer(c.RestConf)
+	server := rest.MustNewServer(c.RestConf, rest.WithCorsHeaders("Access-Control-Allow-Origin"))
 
 	svcCtx := svc.NewServiceContext(c)
+	// api routers
 	handler.RegisterHandlers(server, svcCtx)
+	// web routers
+	handler.RegisterWebRouter(server)
 
 	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)
 	go server.Start()

@@ -20,12 +20,12 @@ import (
 
 // Scanner 批量拉取区块信息，并将区块内交易、事件同步到DB中
 type Scanner struct {
-	client           *ethx.EthClient // ETH客户端
-	abis             map[string]*abi.ABI // 合约地址->abi映射，用于交易、事件解析
-	addresses        []common.Address // 要监听的合约地址，为空则监听全网
-	step             uint64           // 每次批量扫描的区块步长（太大会被 RPC 节点拒绝，推荐 1000-5000）
-	eventLogModel    model.EventLogModel // 交易事件的DB model实例
-	transactionModel model.TransactionModel// 交易的DB model实例
+	client           *ethx.EthClient        // ETH客户端
+	abis             map[string]*abi.ABI    // 合约地址->abi映射，用于交易、事件解析
+	addresses        []common.Address       // 要监听的合约地址，为空则监听全网
+	step             uint64                 // 每次批量扫描的区块步长（太大会被 RPC 节点拒绝，推荐 1000-5000）
+	eventLogModel    model.EventLogModel    // 交易事件的DB model实例
+	transactionModel model.TransactionModel // 交易的DB model实例
 	wg               sync.WaitGroup
 	lock             sync.Mutex
 	finished         bool // 控制拉取任务串行执行

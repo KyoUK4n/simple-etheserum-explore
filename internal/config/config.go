@@ -30,4 +30,5 @@ type EthConfig struct {
 	ReplayEndBlock   uint64
 	ReplayCount      uint64
 	ReplayStep       uint64
+	Tokens           []string
 }

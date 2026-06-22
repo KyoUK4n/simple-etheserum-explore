@@ -4,9 +4,11 @@
 package types
 
 type BalanceInfo struct {
-	Amount       string `json:"amount"`
-	Decimals     int    `json:"decimals"`
-	TokenAddress string `form:"tokenAddress,omitempty"`
+	Name     string `json:"name"`
+	Symbol   string `json:"symbol"`
+	Amount   string `json:"amount"`
+	Decimals int    `json:"decimals"`
+	Address  string `json:"address,omitempty"`
 }
 
 type BlockInfo struct {
@@ -75,14 +77,21 @@ type PullTransactionsReq struct {
 }
 
 type QueryEventLogReq struct {
-	Address string `form:"address,optional"`
-	TxHash  string `form:"txHash,optional"`
+	Address   string `form:"address,optional"`
+	TxHash    string `form:"txHash,optional"`
+	PageIndex int    `form:"pageIndex"`
+	PageSize  int    `form:"pageSize"`
 }
 
 type Response struct {
 	Code int         `json:"code"`
 	Msg  string      `json:"msg"`
 	Data interface{} `json:"data,omitempty"`
+}
+
+type TokenBalances struct {
+	EthBalance    *BalanceInfo   `json:"ethBalance"`
+	TokenBalances []*BalanceInfo `json:"tokenBalances"`
 }
 
 type Transaction struct {
@@ -95,6 +104,7 @@ type Transaction struct {
 	GasPrice  uint64 `json:"gasPrice"`
 	Nonce     uint64 `json:"nonce"`
 	IsPending bool   `json:"isPending"`
+	Timestamp uint64 `json:"timestamp"`
 	TransactionReceipt
 }
 

@@ -18,9 +18,16 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
 		[]rest.Route{
 			{
+				// 获取某个地址的ETH、ERC20代币余额，若TokenAddress未传，则获取ETH余额
 				Method:  http.MethodGet,
 				Path:    "/balances",
 				Handler: v1balance.GetBalanceHandler(serverCtx),
+			},
+			{
+				// 获取某个地址的所有代币余额
+				Method:  http.MethodGet,
+				Path:    "/balances/tokens",
+				Handler: v1balance.GetBalancesOfTokensHandler(serverCtx),
 			},
 		},
 		rest.WithPrefix("/api/v1"),
@@ -29,11 +36,13 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
 		[]rest.Route{
 			{
+				// 获取区间[start - end]区块信息
 				Method:  http.MethodGet,
 				Path:    "/blocks",
 				Handler: v1blocks.GetBlocksHandler(serverCtx),
 			},
 			{
+				// 获取某个区块信息，按照number->hash->tag优先级获取
 				Method:  http.MethodGet,
 				Path:    "/blocks/info",
 				Handler: v1blocks.GetBlockInfoHandler(serverCtx),
@@ -45,21 +54,25 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
 		[]rest.Route{
 			{
+				// 从DB分页查询交易列表
 				Method:  http.MethodGet,
 				Path:    "/transactions",
 				Handler: v1transaction.GetTransactionsHandler(serverCtx),
 			},
 			{
+				// 根据hash获取交易信息
 				Method:  http.MethodGet,
 				Path:    "/transactions/:hash",
 				Handler: v1transaction.GetTransactionInfoHandler(serverCtx),
 			},
 			{
+				// 获取交易的日志
 				Method:  http.MethodGet,
 				Path:    "/transactions/events",
 				Handler: v1transaction.QueryEventLogHandler(serverCtx),
 			},
 			{
+				// 提交区块同步任务，任务串行执行，上一个任务未完成时，接口直接返回失败
 				Method:  http.MethodGet,
 				Path:    "/transactions/pull",
 				Handler: v1transaction.PullFromBlockHandler(serverCtx),

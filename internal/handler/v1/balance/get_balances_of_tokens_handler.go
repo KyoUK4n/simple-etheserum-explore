@@ -1,0 +1,32 @@
+// Code scaffolded by goctl. Safe to edit.
+// goctl 1.10.1
+
+package balance
+
+import (
+	"net/http"
+
+	"github.com/KyoUK4n/etherscan/internal/logic/v1/balance"
+	"github.com/KyoUK4n/etherscan/internal/svc"
+	"github.com/KyoUK4n/etherscan/internal/types"
+	"github.com/zeromicro/go-zero/rest/httpx"
+)
+
+// 获取某个地址的所有代币余额
+func GetBalancesOfTokensHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req types.GetBalanceReq
+		if err := httpx.Parse(r, &req); err != nil {
+			httpx.ErrorCtx(r.Context(), w, err)
+			return
+		}
+
+		l := balance.NewGetBalancesOfTokensLogic(r.Context(), svcCtx)
+		resp, err := l.GetBalancesOfTokens(&req)
+		if err != nil {
+			httpx.ErrorCtx(r.Context(), w, err)
+		} else {
+			httpx.OkJsonCtx(r.Context(), w, resp)
+		}
+	}
+}

@@ -13,9 +13,16 @@ type (
     }
 
     BalanceInfo {
+        Name string `json:"name"`
+        Symbol string `json:"symbol"`
         Amount string `json:"amount"`
         Decimals int `json:"decimals"`
-        TokenAddress string `form:"tokenAddress,omitempty"`
+        Address string `json:"address,omitempty"`
+    }
+
+    TokenBalances {
+        EthBalance *BalanceInfo `json:"ethBalance"`
+        TokenBalances []*BalanceInfo `json:"tokenBalances"`
     }
 )
 
@@ -27,4 +34,8 @@ service etherscan-api {
     @doc "获取某个地址的ETH、ERC20代币余额，若TokenAddress未传，则获取ETH余额"
     @handler GetBalance
     get /balances (GetBalanceReq) returns (Response)
+
+    @doc "获取某个地址的所有代币余额"
+    @handler GetBalancesOfTokens
+    get /balances/tokens (GetBalanceReq) returns (Response)
 }

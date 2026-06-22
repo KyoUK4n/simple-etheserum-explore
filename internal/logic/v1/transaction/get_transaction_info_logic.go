@@ -11,6 +11,7 @@ import (
 	"github.com/KyoUK4n/etherscan/internal/svc"
 	"github.com/KyoUK4n/etherscan/internal/types"
 	"github.com/ethereum/go-ethereum/common"
+	ethtypes "github.com/ethereum/go-ethereum/core/types"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -49,6 +50,22 @@ func (l *GetTransactionInfoLogic) GetTransactionInfo(req *types.GetTransactionIn
 		GasPrice:  tx.GasPrice().Uint64(),
 		Nonce:     tx.Nonce(),
 		IsPending: isPending,
+		Timestamp: uint64(tx.Time().UnixMilli() / 1000),
+	}
+
+	// 通过signer获取sender
+	chainID, err := l.svcCtx.EthClient.ChainID(l.ctx)
+	if err != nil {
+		logx.Errorf("get chain id failed: %v", err)
+	} else {
+		signer := ethtypes.LatestSignerForChainID(chainID)
+
+		sender, err := ethtypes.Sender(signer, tx)
+		if err == nil {
+			txInfo.From = sender.Hex()
+		} else {
+			logx.Errorf("decode sender on [%s] failed: %v", tx.Hash().Hex(), err)
+		}
 	}
 
 	if !isPending {
@@ -64,11 +81,14 @@ func (l *GetTransactionInfoLogic) GetTransactionInfo(req *types.GetTransactionIn
 		txInfo.GasUsed = receipt.GasUsed
 		txInfo.Logs = uint64(len(receipt.Logs))
 
-		sender, err := l.svcCtx.EthClient.TransactionSender(l.ctx, tx, receipt.BlockHash, receipt.TransactionIndex)
+		// 通过区块头获取交易时间
+		blockHeader, err := l.svcCtx.EthClient.HeaderByNumber(l.ctx, receipt.BlockNumber)
 		if err != nil {
-			return logic.OutFailedWithErr(err, "get transaction sender failed")
+			logx.Errorf("get block header failed: %v", err)
+		} else {
+			txInfo.Timestamp = blockHeader.Time
 		}
-		txInfo.From = sender.Hex()
+
 	}
 
 	return logic.OutSuccess(txInfo)

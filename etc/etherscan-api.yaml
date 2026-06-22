@@ -8,7 +8,7 @@ Name: etherscan-api
 # 定义主机ip
 Host: 0.0.0.0
 # 暴露端口
-Port: 8888
+Port: 8080
 # 接口统一超市时间：ms
 Timeout: 60000
 # 日志格式配置
@@ -36,6 +36,12 @@ Eth:
   # 回放的步长，每次批量拉取区块的个数
   # 测试网大部分节点提供商有限制，如Alchemy为10
   ReplayStep: 10
+  # erc-20代币白名单地址，用于获取代币余额
+  Tokens:
+    - 0x779877A7B0D9E8603169DdbD7836e478b4624789
+    - 0x3a3fe695F684Bf9b9e43CF43C2b895Ea5e392bB3
+    - 0x08210F9170F89Ab7658F0B5E3fF39b0E03C594D4
+    - 0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238
   # 订阅相关配置，也会用于批量拉取任务时，过滤交易和事件
   Subscriptions:
     # abi文件位置

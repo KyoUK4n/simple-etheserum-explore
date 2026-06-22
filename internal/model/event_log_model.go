@@ -18,7 +18,7 @@ type (
 	EventLogModel interface {
 		eventLogModel
 		withSession(session sqlx.Session) EventLogModel
-		List(ctx context.Context, txHash string, address string) ([]EventLog, error)
+		List(ctx context.Context, txHash string, address string, pageIndex int, pageSize int) ([]EventLog, uint64, error)
 		BulkInsert(ctx context.Context, logs []*EventLog) error
 	}
 
@@ -38,7 +38,7 @@ func (m *customEventLogModel) withSession(session sqlx.Session) EventLogModel {
 	return NewEventLogModel(sqlx.NewSqlConnFromSession(session))
 }
 
-func (m *customEventLogModel) List(ctx context.Context, txHash string, address string) ([]EventLog, error) {
+func (m *customEventLogModel) List(ctx context.Context, txHash string, address string, pageIndex int, pageSize int) ([]EventLog, uint64, error) {
 	var eventLogs []EventLog
 
 	where := ""
@@ -52,16 +52,25 @@ func (m *customEventLogModel) List(ctx context.Context, txHash string, address s
 		args = append(args, address)
 	}
 
-	query := fmt.Sprintf("select %s from %s where 1 = 1 %s limit 1", eventLogRows, m.table, where)
+	// 查总数
+	var total uint64
+	countQuery := fmt.Sprintf("select count(1) from %s where 1 = 1 %s", m.table, where)
+	err := m.conn.QueryRowCtx(ctx, &total, countQuery, args...)
+	if err != nil {
+		return nil, 0, err
+	}
 
-	err := m.conn.QueryRowsCtx(ctx, &eventLogs, query, args...)
+	// 分页查询
+	args = append(args, (pageIndex-1)*pageSize, pageSize)
+	query := fmt.Sprintf("select %s from %s where 1 = 1 %s limit ?,?", eventLogRows, m.table, where)
+	err = m.conn.QueryRowsCtx(ctx, &eventLogs, query, args...)
 	switch err {
 	case nil:
-		return eventLogs, nil
+		return eventLogs, total, nil
 	case sqlx.ErrNotFound:
-		return nil, ErrNotFound
+		return nil, 0, ErrNotFound
 	default:
-		return nil, err
+		return nil, 0, err
 	}
 }
 

@@ -36,11 +36,7 @@ func (l *QueryEventLogLogic) QueryEventLog(req *types.QueryEventLogReq) (*types.
 	req.Address = strings.TrimSpace(req.Address)
 	req.TxHash = strings.TrimSpace(req.TxHash)
 
-	if req.TxHash == "" && req.Address == "" {
-		return logic.OutFailed("txHash or address is required")
-	}
-
-	eventLogs, err := l.svcCtx.EventLogModel.List(l.ctx, req.TxHash, req.Address)
+	eventLogs, total, err := l.svcCtx.EventLogModel.List(l.ctx, req.TxHash, req.Address, req.PageIndex, req.PageSize)
 	if err != nil {
 		return logic.OutFailedWithErr(err, "query event logs failed")
 	}
@@ -70,5 +66,10 @@ func (l *QueryEventLogLogic) QueryEventLog(req *types.QueryEventLogReq) (*types.
 		res[i] = e
 	}
 
-	return logic.OutSuccess(res)
+	return logic.OutSuccess(map[string]any{
+		"total":     total,
+		"list":      res,
+		"pageIndex": req.PageIndex,
+		"pageSize":  req.PageSize,
+	})
 }

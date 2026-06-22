@@ -31,6 +31,7 @@
     ├── ethx                            # 包装的ethclient
     ├── limiter                         # 限流器
     └── utils                           # 纯工具方法
+├── web                                 # 前端部分，可以独立开发、运行，也可以打包后，通过后端反向代理静态资源运行
 ```
 
 ## 项目功能
@@ -63,7 +64,19 @@
 
 ---
 
-## Quick Start
+# Quick Start
+
+推荐前端代码打包后，直接运行golang服务，可同时运行前端+api服务
+
+运行后，访问服务根路由即是访问前端页面
+```shell
+# etc/etherscan-api.yaml配置端口
+# 浏览器直接访问http://localhost:8080，就可以进入前端页面
+Port: 8080
+```
+
+
+## Backend
 
 ### 1. 拉取依赖
 
@@ -75,7 +88,15 @@ go mod tidy && go mod vendor
 
 在`etc`目录下查看所有配置说明，补充需要的配置信息
 
-### 3. 启动项目
+### 3. 启动MySQL
+
+通过`docker`启动`mysql`
+```shell
+docker-compose -f docker/docker-compose.yaml up -d
+```
+> 如果已有mysql实例，此步省略，在配置文件中配置mysql地址即可
+
+### 4. 启动项目
 
 ```shell
 go run etherscan.go
@@ -123,3 +144,9 @@ func (l *GetBalanceLogic) GetBalance(req *types.GetBalanceReq) (resp *types.Resp
 	return
 }
 ```
+
+---
+
+## Frontend
+
+参考[FRONTEND.md](web/README.md)
